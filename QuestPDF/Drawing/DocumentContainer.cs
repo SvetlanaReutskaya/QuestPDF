@@ -9,6 +9,20 @@ namespace QuestPDF.Drawing
 {
     internal class DocumentContainer : IDocumentContainer
     {
+        private Theme _theme;
+        internal Theme MainTheme { 
+            get
+            {
+                if (_theme != null)
+                    return _theme;
+                else 
+                    return new LightTheme();
+            }
+            set
+            {
+                _theme = value;
+            }
+        }
         internal List<IComponent> Pages { get; set; } = new List<IComponent>();
         
         internal Container Compose()

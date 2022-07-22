@@ -8,7 +8,30 @@ namespace QuestPDF.Fluent
 {
     public class PageDescriptor
     {
+        internal Theme Theme { get; }
         internal Page Page { get; } = new Page();
+
+        public PageDescriptor(Theme theme) 
+        {
+            Page = new Page();
+            Theme = theme;
+
+            SetDefaultProperties();
+        }
+
+        public void SetDefaultProperties()
+        {
+           Size(Theme.PageSize);
+           PageColor(Theme.PageColor);
+
+            TextStyle style = new TextStyle()
+            {
+                Color = Theme.FontColor,
+                FontFamily = Theme.MainFont,
+                FontWeight = Theme.FontWeight
+            };
+            DefaultTextStyle(style);
+        }
 
         public void Size(float width, float height, Unit unit = Unit.Inch)
         {
@@ -116,6 +139,15 @@ namespace QuestPDF.Fluent
         public IContainer Header()
         {
             var container = new Container();
+
+            TextStyle style = new TextStyle()
+            {
+                Color = Theme.HeaderColor,
+                FontFamily = Theme.HeaderFont,
+                FontWeight = Theme.HeaderWeight
+            };
+            container.ApplyDefaultTextStyle(style);
+
             Page.Header = container;
             return container;
         }
@@ -123,6 +155,15 @@ namespace QuestPDF.Fluent
         public IContainer Content()
         {
             var container = new Container();
+
+            TextStyle style = new TextStyle()
+            {
+                Color = Theme.FontColor,
+                FontFamily = Theme.MainFont,
+                FontWeight = Theme.FontWeight
+            };
+            container.ApplyDefaultTextStyle(style);
+
             Page.Content = container;
             return container;
         }
@@ -130,6 +171,15 @@ namespace QuestPDF.Fluent
         public IContainer Footer()
         {
             var container = new Container();
+
+            TextStyle style = new TextStyle()
+            {
+                Color = Theme.HeaderColor,
+                FontFamily = Theme.HeaderFont,
+                FontWeight = Theme.HeaderWeight
+            };
+            container.ApplyDefaultTextStyle(style);
+
             Page.Footer = container;
             return container;
         }
@@ -139,10 +189,13 @@ namespace QuestPDF.Fluent
     {
         public static IDocumentContainer Page(this IDocumentContainer document, Action<PageDescriptor> handler)
         {
-            var descriptor = new PageDescriptor();
+            var documentInstance = (document as DocumentContainer);
+            var defaultTheme = documentInstance.MainTheme;
+            var descriptor = new PageDescriptor(defaultTheme);
+
             handler(descriptor);
-            
-            (document as DocumentContainer).Pages.Add(descriptor.Page);
+
+            documentInstance.Pages.Add(descriptor.Page);
             
             return document;
         }
